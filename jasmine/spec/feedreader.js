@@ -34,10 +34,8 @@ $(function() {
         it('url is defined and not empty', function() {
 
             for(var i = 0; i < allFeeds.length; i++) {
-            expect(allFeeds[i].url).toBeDefined();
-            console.log(allFeeds[i].url);
-            expect(allFeeds[i].url).not.toBe(0);
-
+                expect(allFeeds[i].url).toBeDefined();
+                expect(allFeeds[i].url.length).not.toBe(0);
            }
         });
 
@@ -49,9 +47,8 @@ $(function() {
          it('name is defined and not empty', function() {
 
             for(var i = 0; i < allFeeds.length; i++) {
-            expect(allFeeds[i].name).toBeDefined();
-            expect(allFeeds[i].name).not.toBe(0);
-
+                expect(allFeeds[i].name).toBeDefined();
+                expect(allFeeds[i].name.length).not.toBe(0);
            }
         });
     });
@@ -80,39 +77,42 @@ $(function() {
 
             it('ensures the menu element is hidden by default', function() {
 
-
+                var menuhiddenclass = $('body').hasClass('menu-hidden'); // default menu-hidden set
+                expect(menuhiddenclass).toBe(true);
+                //additional test to verify the menu is hidden wrt. screen
                 var left = rect.left;
                 var right = rect.right;
                 var bottom = rect.bottom;
                 var top = rect.top;
                 var screenheight = $(window).height();
                 var screenwidth = $(window).width();
+                hidden = false;
                 if(right <= 0)
-                    expect(right).not.toBeGreaterThan(0); // to the left of screen window
-                else if(bottom <=0)
-                    expect(bottom).not.toBeGreaterThan(0); // on top of screen window
+                    hidden = true; // to the left of screen window
+                else if(bottom <= 0)
+                    hidden = true; // on top of screen window
                 else if (left > screenwidth)
-                     expect(left).not.toBeLessThan(screenwidth); // to the right of screen window
+                     hidden = true; // to the right of screen window
                 else if (top > screenheight)
-                     expect(top).not.toBeLessThan(screenheight); // below the screen window
+                     hidden = true; // below the screen window
                 else
-                    fail("menu is not hidden");
-
-               // expect(rect.bottom).not.toBeGreaterThan(0);
-               // var tr = $(".menu").css("transform").value;
-            // console.log(tr);
-                //".menu").css("transform").matrix
-                //expect((".menu").css("transform").not.toBe(0);
-
+                    hidden = false;
+                expect(hidden).toBe(true);
 
           });
 
             it('ensures menu display when icon clicked and hides when clicked again', function() {
-                var res1 = $('body').hasClass('.menu-hidden');
-                expect(res1).not.toBe(true);
+
+                var menuhiddenclass = $('body').hasClass('menu-hidden'); // default menu-hidden set
+                expect(menuhiddenclass).toBe(true);
+
                 $('.menu-icon-link').trigger('click');
-                var res2 = $('body').hasClass('.menu');
-                expect(res2).not.toBe(true);
+                menuhiddenclass = $('body').hasClass('menu-hidden');
+                expect(menuhiddenclass).toBe(false);
+
+                $('.menu-icon-link').trigger('click');
+                menuhiddenclass = $('body').hasClass('menu-hidden');
+                expect(menuhiddenclass).toBe(true);
              });
 
 
@@ -154,30 +154,23 @@ $(function() {
             var children1;
             var children2;
             beforeEach (function(done) {
+
                 loadFeed(0,function() {
-                    children1 = $('.feed').children();
+                    feed1contents = $('.feed').html();
                     loadFeed(1,function() {
-                        children2 = $('.feed').children();
+                        feed2contents = $('.feed').html();
                         done();
                     });
-
-            });
+                });
             });
 
             it ('ensure feed results are different', function(done) {
-                flag = false;
-                for(i=0; i< children1.length; i++) {
-                    c1 = children1.get(0);
-                    for(i=0; i< children2.length; i++) {
-                        c2 = children2.get(0);
-                        if( c1.valueOf() !== c2.valueOf())
-                            flag = true;
-                    }
-                    if(flag)
-                        break;
-                }
-                expect(flag).toBe(true);
-                done();
+
+               var htmlDiff = true;
+                 if(feed1contents.valueOf() === feed2contents.valueOf())
+                    htmlDiff = false;
+                 expect(htmlDiff).toBe(true);
+                 done();
             });
 
          });
